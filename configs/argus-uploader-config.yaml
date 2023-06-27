@@ -1,0 +1,23 @@
+salsaServer:
+  address: "0.0.0.0"
+  port: "7043"
+
+transferServer:
+  address: "0.0.0.0"
+  port: "7043"
+
+storage:
+  path: "/tmp/data/"
+  long_term_storage_path: "/pendrive/profesional/magicleap/backup_filesystem_produccion"
+
+postgres:
+  name: "argus_local"
+  host: "192.168.1.5"
+  port: "6432"
+  user: "postgres"
+  password: "postgres"
+  check_for_duplicates: true
+  
+  
+
+

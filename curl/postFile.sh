@@ -1,0 +1,1 @@
+time curl -X POST --location 'http://localhost:7043/uploader/transfer' --form 'file-upload=@"/pendrive/profesional/magicleap/bugreports/success/bugreport-demophon_aosp-B3E.220713.07-A618-2022-07-13-22-50-47.zip"' --form 'hash="MjV8ZmFrZVVzZXJuYW1l"'
