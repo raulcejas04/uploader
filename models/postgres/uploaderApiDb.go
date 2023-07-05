@@ -6,7 +6,10 @@ import (
 	"time"
 	//"github.com/spf13/viper"	
 )
+
+
 func OpenSession( fileName string, userName string ) string {
+
 	bugreport := &Bugreport{
 		FileName:         fileName,
 		UserName:         userName,
@@ -24,24 +27,27 @@ func OpenSession( fileName string, userName string ) string {
 		return ""
 	}
 
+	state := &State{}
+	state.SetState ( int(bugreport.ID), "GET_HASH", STARTED )
+
 	result = Db.Delete(&bugreport)
 	if result.Error != nil {
 		err1 := fmt.Errorf("postgres: UploadBugreport: %w", result.Error)
 		log.Error(err1)
 		return ""
 	}
+
 	id := int(bugreport.ID)
-	
-	//mySecret:=viper.GetString("session.secret")
 	hash := encoding.Encode([]byte(fmt.Sprintf("%d|%s",id,userName)))
 
+	state.SetState ( int(id), "GET_HASH", FINISHED )
 	return hash
 }
 
 
 func FinishTransfer( id int, filename string, upload_size int ) {
 
-	fmt.Println( "id ", id )
+
 	var bugreport Bugreport
 	result := Db.Unscoped().First( &bugreport, id )
 	if result.Error != nil {
@@ -65,6 +71,5 @@ func FinishTransfer( id int, filename string, upload_size int ) {
 
 	return
 }
-
 
 

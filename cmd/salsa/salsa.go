@@ -38,23 +38,26 @@ func handleRequests() {
 
 }
 
-func HandlerState(httpWriter http.ResponseWriter, httpRequest *http.Request) {
+func HandlerState(w http.ResponseWriter, r *http.Request) {
 
-	id, err := strconv.Atoi(httpRequest.URL.Query().Get("bugReportId"))
+
+	hash:=r.FormValue("hash")
+	if hash=="" {
+		http.Error(w, "Missing hash",  http.StatusInternalServerError)
+		return
+	}
+
+	dummy:=string(encoding.Decode(hash))
+	res := strings.Split(dummy, "|")	
+
+	id:= res[0]
+	//username:=res[1] //to compare with token
+	idInt, err := strconv.Atoi(id)
 	if err != nil {
 		log.Error(err)
 	}
 
-	//results :=map[string]interface{}{}
-	results :=map[string]interface{}{}
-	if err := postgres.Db.Table("states").Select("\"step\",\"sequence\",task_name,state,TO_CHAR(time_start,'YYYY-MM-DD HH:MM:SS') time_start,TO_CHAR(time_end,'YYYY-MM-DD HH:MM:SS') time_end").Where("bugreport_id=?", id).Order("id").Find(&results).Error; err != nil {
-		log.Error(err)
-		return
-	}
-	/*if err := postgres.Db.Table("states").Where("bugreport_id=?", id).Order("id").Find(&results).Error; err != nil {
-		log.Error(err)
-		return
-	}*/
+	results:=postgres.GetStates( idInt )
 	
 	jsonResp, err := json.Marshal(results)
 	if err != nil {
@@ -62,8 +65,8 @@ func HandlerState(httpWriter http.ResponseWriter, httpRequest *http.Request) {
 		return
 	}
 
-	httpWriter.Header().Set("Content-Type", "application/json")
-	httpWriter.Write(jsonResp)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonResp)
 	return
 }
 
@@ -85,26 +88,34 @@ func HandlerOpenSession(httpWriter http.ResponseWriter, httpRequest *http.Reques
 }
 
 func HandlerTransfer(w http.ResponseWriter, r *http.Request) {
-	// Maximum upload of 10 MB files
+
+	// Maximum upload of 10 MB files legacy from classic
 	r.ParseMultipartForm(10 << 20)
 
 	hash:=r.FormValue("hash")
-	fmt.Println( "hash ",hash )
 	
 	if hash=="" {
 		http.Error(w, "Missing hash",  http.StatusInternalServerError)
 		return
 	}
 
-	//storagePath := viper.GetString("storage.path")
 		
 	dummy:=string(encoding.Decode(hash))
 
 	res := strings.Split(dummy, "|")	
 
 	id:= res[0]
-	username:=res[1]
-	fmt.Println("dummy ",dummy, id, username )
+	//username:=res[1] //to compare with token
+	idInt, err := strconv.Atoi(id)
+	if err != nil {
+		log.Error(err)
+	}
+		
+	state := &postgres.State{}
+	state.SetState( idInt, "TRANSFER_FILE", postgres.STARTED )
+
+	
+	//fmt.Println("dummy ",dummy, id, username )
 	//TODO check if the token is from the same username
 	// Get handler for filename, size and headers
 	file, handler, err := r.FormFile("file-upload")
@@ -148,11 +159,9 @@ func HandlerTransfer(w http.ResponseWriter, r *http.Request) {
 	elapsed := time.Since(start)
 	log.Info("Successfully Uploaded File", handler.Filename, " elapsed ", elapsed)
 	
-	idInt, err := strconv.Atoi(id)
-	if err != nil {
-		log.Error(err)
-	}
 	postgres.FinishTransfer( idInt, handler.Filename, upload_size )
+	state.SetState ( idInt, "TRANSFER_FILE", postgres.FINISHED )
+	
 }
 
 

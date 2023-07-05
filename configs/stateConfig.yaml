@@ -1,0 +1,70 @@
+- StepName: OPEN_SESSION
+  Tasks:
+    - Order: 0
+      TasksDetail:
+        - Name: GET_HASH
+          Status: ""
+          TimeStart: null
+          TimeEnd: null
+- StepName: TRANSFER_FILE
+  Tasks:
+    - Order: 0
+      TasksDetail:
+        - Name: TRANSFER_FILE
+          Status: ""
+          TimeStart: null
+          TimeEnd: null
+- StepName: CHECK_STRUCTURE
+  Tasks:
+    - Order: 0
+      TasksDetail:
+        - Name: UNPACK
+          Status: ""
+          TimeStart: null
+          TimeEnd: null
+    - Order: 1
+      TasksDetail:
+        - Name: CHECK_STRUCTURE
+          Status: ""
+          TimeStart: null
+          TimeEnd: null
+- StepName: VALIDATE
+  Tasks:
+    - Order: 0
+      TasksDetail:
+        - Name: DUPLICATED
+          Status: ""
+          TimeStart: null
+          TimeEnd: null
+    - Order: 1
+      TasksDetail:
+        - Name: CONTAINED
+          Status: ""
+          TimeStart: null
+          TimeEnd: null
+    - Order: 3
+      TasksDetail:
+        - Name: METADATA_SAVED
+          Status: ""
+          TimeStart: null
+          TimeEnd: null
+- StepName: CONTENT
+  Tasks:
+    - Order: 0
+      TasksDetail:
+        - Name: TANGO
+          Status: ""
+          TimeStart: null
+          TimeEnd: null
+        - Name: HERA
+          Status: ""
+          TimeStart: null
+          TimeEnd: null
+        - Name: BOOTDR
+          Status: ""
+          TimeStart: null
+          TimeEnd: null
+        - Name: CONCATENATED_FILE
+          Status: ""
+          TimeStart: null
+          TimeEnd: null

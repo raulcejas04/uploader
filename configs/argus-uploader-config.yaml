@@ -6,6 +6,8 @@ transferServer:
   address: "0.0.0.0"
   port: "7043"
 
+StateConfig:
+  currentFile: "stateConfig.yaml"
 storage:
   path: "/tmp/data/"
   long_term_storage_path: "/pendrive/profesional/magicleap/backup_filesystem_produccion"

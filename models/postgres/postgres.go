@@ -6,16 +6,16 @@ import (
 
 	//"github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
-
+	logdebug "log"
 
 	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
-	//"gorm.io/gorm/logger"
+	"gorm.io/gorm/logger"
 	//"strconv"
 	"time"
-	//"os"
+	"os"
 )
 
 type Bugreport struct {
@@ -48,18 +48,9 @@ type Bugreport struct {
 	Duration             int             `gorm:"index:natural_unique_key,unique"`
 	TangoStatus          int             `gorm:"default:0"`
 	States		     []State        `gorm:"constraint:OnDelete:CASCADE"`
+	ConfigFile	     string
 }
 
-type State struct {
-	gorm.Model
-	BugreportID       int	
-	Step string
-	Sequence string
-	TaskName string
-	State string
-	TimeStart *time.Time
-	TimeEnd *time.Time
-}
 
 var Db *gorm.DB
 
@@ -76,7 +67,7 @@ func NewConnection() error {
 	password := viper.GetString("postgres.password")
 
 
-	/*newLogger := logger.New(
+	newLogger := logger.New(
 	  logdebug.New(os.Stdout, "\r\n", logdebug.LstdFlags), // io writer
 	  logger.Config{
 	    SlowThreshold:              time.Second,   // Slow SQL threshold
@@ -84,15 +75,15 @@ func NewConnection() error {
 	    IgnoreRecordNotFoundError: true,           // Ignore ErrRecordNotFound error for logger
 	    Colorful:                  false,          // Disable color
 	  },
-	)*/
+	)
 
 	dsn := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s port=%s", host, user, name, password, port)
 
 	var err error
 	// open connection
 	// Note: if we can't make a connection to the database no err is being returned
-	//Db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{Logger: newLogger,})
-	Db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{SkipDefaultTransaction: true,})
+	Db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{Logger: newLogger,})
+	//Db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{SkipDefaultTransaction: true,})
 
 	if err != nil {
 		return err
